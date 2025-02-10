@@ -1,0 +1,22 @@
+#!/bin/bash
+
+mapfile -t monitors < <(xrandr | grep ' connected' | cut -d' ' -f1)
+count=$(xrandr | grep -c ' connected')
+
+if [ "$count" -eq 3 ]; then
+    xrandr --output ${monitors[1]} --left-of ${monitors[0]} --auto &>/dev/null
+    xrandr --output ${monitors[2]} --right-of ${monitors[0]} --auto &>/dev/null
+	i3-msg "workspace 1; move workspace to output ${monitors[1]}" &>/dev/null
+	i3-msg "workspace 2; move workspace to output ${monitors[0]}" &>/dev/null
+	i3-msg "workspace 3; move workspace to output ${monitors[2]}" &>/dev/null
+elif [ "$count" -eq 2 ]; then
+    xrandr --output ${monitors[1]} --right-of ${monitors[0]} --auto &>/dev/null
+	i3-msg "workspace 1; move workspace to output ${monitors[0]}" &>/dev/null
+	i3-msg "workspace 2; move workspace to output ${monitors[1]}" &>/dev/null
+elif [ "$count" -lt 2 ]; then
+	echo "ERROR: Multiple monitors not detected."
+	echo "Current monitor count: $count"
+else
+	echo "ERROR: monsetor currently doesn't support more than 3 monitors."
+	echo "Current monitor count: $count"
+fi
