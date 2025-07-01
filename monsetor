@@ -14,9 +14,7 @@ elif [ "$count" -eq 2 ]; then
 	i3-msg "workspace 1; move workspace to output ${monitors[0]}" &>/dev/null
 	i3-msg "workspace 2; move workspace to output ${monitors[1]}" &>/dev/null
 elif [ "$count" -eq 1 ]; then
-	xrandr --output ${monitors[0]} --auto &>/dev/null
-	xrandr --output ${monitors[1]} --auto &>/dev/null
-	xrandr --output ${monitors[2]} --auto &>/dev/null
+	i3-msg "workspace 2; move workspace to output ${monitors[0]}" &>/dev/null
 else
 	echo "ERROR: monsetor currently doesn't support more than 3 monitors."
 	echo "Current monitor count: $count"
