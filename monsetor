@@ -22,6 +22,9 @@ elif [ "$count" -eq 1 ]; then
 	for monitor in "${inactive_monitors[@]}"; do
 		xrandr --output ${monitor} --off &>/dev/null
 	done
+elif [ "$count" -eq 0 ]; then
+	echo "No active monitors detected."
+	echo "How are you even running this script, bruh?"
 else
 	echo "ERROR: monsetor currently doesn't support more than 3 monitors."
 	echo "Current monitor count: $count"
