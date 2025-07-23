@@ -1,20 +1,27 @@
 #!/bin/bash
 
-mapfile -t monitors < <(xrandr | grep ' connected' | cut -d' ' -f1)
+mapfile -t active_monitors < <(xrandr | grep ' connected' | cut -d' ' -f1)
+mapfile -t inactive_monitors < <(xrandr | grep ' disconnected' | cut -d' ' -f1)
 count=$(xrandr | grep -c ' connected')
 
 if [ "$count" -eq 3 ]; then
-    xrandr --output ${monitors[1]} --left-of ${monitors[0]} --auto &>/dev/null
-    xrandr --output ${monitors[2]} --right-of ${monitors[0]} --auto &>/dev/null
-	i3-msg "workspace 1; move workspace to output ${monitors[1]}" &>/dev/null
-	i3-msg "workspace 2; move workspace to output ${monitors[0]}" &>/dev/null
-	i3-msg "workspace 3; move workspace to output ${monitors[2]}" &>/dev/null
+	xrandr --output ${active_monitors[0]} --auto
+    xrandr --output ${active_monitors[1]} --left-of ${active_monitors[0]} --auto &>/dev/null
+    xrandr --output ${active_monitors[2]} --right-of ${active_monitors[0]} --auto &>/dev/null
+	for monitor in "${inactive_monitors[@]}"; do
+		xrandr --output ${monitor} --off &>/dev/null
+	done
 elif [ "$count" -eq 2 ]; then
-    xrandr --output ${monitors[1]} --right-of ${monitors[0]} --auto &>/dev/null
-	i3-msg "workspace 1; move workspace to output ${monitors[0]}" &>/dev/null
-	i3-msg "workspace 2; move workspace to output ${monitors[1]}" &>/dev/null
+	xrandr --output ${active_monitors[0]} --auto
+    xrandr --output ${active_monitors[1]} --right-of ${active_monitors[0]} --auto &>/dev/null
+	for monitor in "${inactive_monitors[@]}"; do
+		xrandr --output ${monitor} --off &>/dev/null
+	done
 elif [ "$count" -eq 1 ]; then
-	i3-msg "workspace 2; move workspace to output ${monitors[0]}" &>/dev/null
+	xrandr --output ${active_monitors[0]} --auto &>/dev/null
+	for monitor in "${inactive_monitors[@]}"; do
+		xrandr --output ${monitor} --off &>/dev/null
+	done
 else
 	echo "ERROR: monsetor currently doesn't support more than 3 monitors."
 	echo "Current monitor count: $count"
