@@ -4,46 +4,109 @@ mapfile -t active_monitors < <(xrandr | grep " connected" | cut -d" " -f1)
 mapfile -t inactive_monitors < <(xrandr | grep " disconnected" | cut -d" " -f1)
 count=$(xrandr | grep -c " connected")
 
-case ${count} in
-	3)
-		echo "3 monitors detected. Setting up layout..."
+run() {
+	case ${count} in
+		3)
+			echo "3 monitors detected. Setting up layout..."
+			
+			case ${1} in
+				"duplicate")
+					for monitor in "${active_monitors[@]}"; do
+						xrandr --output ${monitor} --auto --same-as ${active_monitors[0]} &>/dev/null
+					done
 
-		xrandr --output ${active_monitors[0]} --auto
-		xrandr --output ${active_monitors[1]} --left-of ${active_monitors[0]} --auto &>/dev/null
-		xrandr --output ${active_monitors[2]} --right-of ${active_monitors[0]} --auto &>/dev/null
-		for monitor in "${inactive_monitors[@]}"; do
-			xrandr --output ${monitor} --off &>/dev/null
-		done
+					echo "All monitors duplicated to ${active_monitors[0]}"
+					exit 0
+					;;
+				*)
+					xrandr --output ${active_monitors[0]} --auto
+					xrandr --output ${active_monitors[1]} --left-of ${active_monitors[0]} --auto &>/dev/null
+					xrandr --output ${active_monitors[2]} --right-of ${active_monitors[0]} --auto &>/dev/null
+					for monitor in "${inactive_monitors[@]}"; do
+						xrandr --output ${monitor} --off &>/dev/null
+					done
 
-		echo "Layout set: ${active_monitors[1]} | ${active_monitors[0]} | ${active_monitors[2]}"
-		;;
-	2)
-		echo "2 monitors detected. Setting up layout..."
+					echo "Layout set: ${active_monitors[1]} | ${active_monitors[0]} | ${active_monitors[2]}"
+					exit 0
+					;;
+			esac
+			;;
+		2)
+			echo "2 monitors detected. Setting up layout..."
 
-		xrandr --output ${active_monitors[0]} --auto
-		xrandr --output ${active_monitors[1]} --right-of ${active_monitors[0]} --auto &>/dev/null
-		for monitor in "${inactive_monitors[@]}"; do
-			xrandr --output ${monitor} --off &>/dev/null
-		done
+			case ${1} in
+				"duplicate")
+					for monitor in "${active_monitors[@]}"; do
+						xrandr --output ${monitor} --auto --same-as ${active_monitors[0]} &>/dev/null
+					done
 
-		echo "Layout set: ${active_monitors[0]} | ${active_monitors[1]}"
-		;;
-	1)
-		echo "1 monitor detected. Setting up layout..."
+					echo "All monitors duplicated to ${active_monitors[0]}"
+					exit 0
+					;;
+				*)
+					xrandr --output ${active_monitors[0]} --auto
+					xrandr --output ${active_monitors[1]} --right-of ${active_monitors[0]} --auto &>/dev/null
+					for monitor in "${inactive_monitors[@]}"; do
+						xrandr --output ${monitor} --off &>/dev/null
+					done
 
-		xrandr --output ${active_monitors[0]} --auto &>/dev/null
-		for monitor in "${inactive_monitors[@]}"; do
-			xrandr --output ${monitor} --off &>/dev/null
-		done
+					echo "Layout set: ${active_monitors[0]} | ${active_monitors[1]}"
+					exit 0
+					;;
+			esac
+			;;
+		1)
+			echo "1 monitor detected. Setting up layout..."
 
-		echo "Layout set: ${active_monitors[0]}"
-		;;
-	0)
-		echo "No active monitors detected."
-		echo "How are you even running this script, bruh?"
-		;;
-	*)
-		echo "ERROR: monsetor currently doesn't support more than 3 monitors."
-		echo "Current monitor count: ${count}"
-		;;
-esac
+			xrandr --output ${active_monitors[0]} --auto &>/dev/null
+			for monitor in "${inactive_monitors[@]}"; do
+				xrandr --output ${monitor} --off &>/dev/null
+			done
+
+			echo "Layout set: ${active_monitors[0]}"
+			exit 0
+			;;
+		0)
+			echo "No active monitors detected."
+			echo "How are you even running this script, bruh?"
+			exit 1
+			;;
+		*)
+			echo "ERROR: monsetor currently doesn't support more than 3 monitors."
+			echo "Current monitor count: ${count}"
+			exit 1
+			;;
+	esac
+}
+
+while [[ ${#} -gt 0 ]]; do
+	case ${1} in
+		-h | --help)
+			echo "Usage: monsetor [OPTIONS]"
+			echo
+			echo "Automatically configures monitor layout based on the number of connected monitors."
+			echo
+			echo "Options:"
+			echo "  -h, --help			Show this help message and exit"
+			echo "  -e, --extend		Extend primary monitor to all connected monitors (default behavior)"
+			echo "  -d, --duplicate		Duplicate primary monitor to all connected monitors"
+			exit 0
+			;;
+		-d | --duplicate)
+			run "duplicate"
+			exit 0
+			;;
+		-e | --extend)
+			run
+			exit 0
+			;;
+		*)
+			echo "Unknown option: ${1}"
+			echo "Use -h or --help for usage information."
+			exit 1
+			;;
+	esac
+	shift
+done
+
+run
