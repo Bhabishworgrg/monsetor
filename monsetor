@@ -1,31 +1,49 @@
-#!/bin/bash
+#!/bin/env bash
 
-mapfile -t active_monitors < <(xrandr | grep ' connected' | cut -d' ' -f1)
-mapfile -t inactive_monitors < <(xrandr | grep ' disconnected' | cut -d' ' -f1)
-count=$(xrandr | grep -c ' connected')
+mapfile -t active_monitors < <(xrandr | grep " connected" | cut -d" " -f1)
+mapfile -t inactive_monitors < <(xrandr | grep " disconnected" | cut -d" " -f1)
+count=$(xrandr | grep -c " connected")
 
-if [ "$count" -eq 3 ]; then
-	xrandr --output ${active_monitors[0]} --auto
-    xrandr --output ${active_monitors[1]} --left-of ${active_monitors[0]} --auto &>/dev/null
-    xrandr --output ${active_monitors[2]} --right-of ${active_monitors[0]} --auto &>/dev/null
-	for monitor in "${inactive_monitors[@]}"; do
-		xrandr --output ${monitor} --off &>/dev/null
-	done
-elif [ "$count" -eq 2 ]; then
-	xrandr --output ${active_monitors[0]} --auto
-    xrandr --output ${active_monitors[1]} --right-of ${active_monitors[0]} --auto &>/dev/null
-	for monitor in "${inactive_monitors[@]}"; do
-		xrandr --output ${monitor} --off &>/dev/null
-	done
-elif [ "$count" -eq 1 ]; then
-	xrandr --output ${active_monitors[0]} --auto &>/dev/null
-	for monitor in "${inactive_monitors[@]}"; do
-		xrandr --output ${monitor} --off &>/dev/null
-	done
-elif [ "$count" -eq 0 ]; then
-	echo "No active monitors detected."
-	echo "How are you even running this script, bruh?"
-else
-	echo "ERROR: monsetor currently doesn't support more than 3 monitors."
-	echo "Current monitor count: $count"
-fi
+case ${count} in
+	3)
+		echo "3 monitors detected. Setting up layout..."
+
+		xrandr --output ${active_monitors[0]} --auto
+		xrandr --output ${active_monitors[1]} --left-of ${active_monitors[0]} --auto &>/dev/null
+		xrandr --output ${active_monitors[2]} --right-of ${active_monitors[0]} --auto &>/dev/null
+		for monitor in "${inactive_monitors[@]}"; do
+			xrandr --output ${monitor} --off &>/dev/null
+		done
+
+		echo "Layout set: ${active_monitors[1]} | ${active_monitors[0]} | ${active_monitors[2]}"
+		;;
+	2)
+		echo "2 monitors detected. Setting up layout..."
+
+		xrandr --output ${active_monitors[0]} --auto
+		xrandr --output ${active_monitors[1]} --right-of ${active_monitors[0]} --auto &>/dev/null
+		for monitor in "${inactive_monitors[@]}"; do
+			xrandr --output ${monitor} --off &>/dev/null
+		done
+
+		echo "Layout set: ${active_monitors[0]} | ${active_monitors[1]}"
+		;;
+	1)
+		echo "1 monitor detected. Setting up layout..."
+
+		xrandr --output ${active_monitors[0]} --auto &>/dev/null
+		for monitor in "${inactive_monitors[@]}"; do
+			xrandr --output ${monitor} --off &>/dev/null
+		done
+
+		echo "Layout set: ${active_monitors[0]}"
+		;;
+	0)
+		echo "No active monitors detected."
+		echo "How are you even running this script, bruh?"
+		;;
+	*)
+		echo "ERROR: monsetor currently doesn't support more than 3 monitors."
+		echo "Current monitor count: ${count}"
+		;;
+esac
