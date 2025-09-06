@@ -87,9 +87,9 @@ while [[ ${#} -gt 0 ]]; do
 			echo "Automatically configures monitor layout based on the number of connected monitors."
 			echo
 			echo "Options:"
-			echo "  -h, --help			Show this help message and exit"
+			echo "  -h, --help		Show this help message and exit"
 			echo "  -e, --extend		Extend primary monitor to all connected monitors (default behavior)"
-			echo "  -d, --duplicate		Duplicate primary monitor to all connected monitors"
+			echo "  -d, --duplicate	Duplicate primary monitor to all connected monitors"
 			exit 0
 			;;
 		-d | --duplicate)
