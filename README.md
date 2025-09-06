@@ -1,6 +1,6 @@
 <h1 align="center">monsetor</h1>
 
-Sick of configuring your monitor layout every time you connect a new monitor with <code>xrandr</code>? <strong>monsetor</strong> is here to help!
+Sick of configuring your monitor layout every time you connect a new monitor with xrandr? monsetor is here to help!
 
 ---
 
