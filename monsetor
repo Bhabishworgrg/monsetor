@@ -40,6 +40,21 @@ apply_layout() {
 
 			( IFS="|"; echo "Layout set: ${active_monitors[*]}" )
 			;;
+		"extend-portrait")
+			for i in "${!active_monitors[@]}"; do
+				if [[ ${i} -eq 0 ]]; then
+					continue
+				fi
+
+				side="right-of"
+				if [[ ${i} -eq 1 && ${count} -eq 3 ]]; then
+					side="left-of"
+				fi
+				xrandr --output "${active_monitors[$i]}" --rotate left --${side} "${primary}" --auto &>/dev/null
+			done
+
+			( IFS="|"; echo "Layout set: ${active_monitors[*]}" )
+			;;
 	esac
 
 	for monitor in "${inactive_monitors[@]}"; do
@@ -59,9 +74,10 @@ Usage: monsetor [OPTIONS]
 Automatically configures monitor layout based on connected monitors.
 
 Options:
-  -h, --help        Show this help message
-  -e, --extend      Extend primary monitor to all connected monitors (default)
-  -d, --duplicate   Duplicate primary monitor to all connected monitors
+  -h, --help        	Show this help message
+  -e, --extend      	Extend primary monitor to all connected monitors (default)
+  -d, --duplicate   	Duplicate primary monitor to all connected monitors
+  -p, --extend-portrait	Extend primary monitor and set other monitors to portrait mode
 EOF
             exit 0
             ;;
@@ -71,6 +87,9 @@ EOF
         -e|--extend)
             mode="extend"
             ;;
+		-p|--extend-portrait)
+			mode="extend-portrait"
+			;;
         *)
             echo "Unknown option: ${1}"
             echo "Use -h or --help for usage information."
