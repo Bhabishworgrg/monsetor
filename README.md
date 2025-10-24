@@ -4,39 +4,8 @@ Sick of configuring your monitor layout every time you connect a new monitor wit
 
 ---
 
-## Installation
-
-- Clone the repository:
-```bash
-git clone https://github.com/Bhabishworgrg/monsetor.git
-cd monsetor
-```
-- Install the tool:
-```bash
-sudo install.sh
-```
-
-## Usage
-
-- To extend your display, run:
-```bash
-monsetor -e
-```
-Or simply:
-```bash
-monsetor
-```
-- To duplicate your display, run:
-```bash
-monsetor -d
-```
-- For more options, see:
-```bash
-monsetor -h
-```
-
-## Future Plans
-The plan is to migrate this project to Rust. This bash version will be maintained until the Rust version is complete and remain available as legacy for users who prefer it.
+## Rust Version
+The migration to Rust is currently in progress. You can use the current working bash version while the Rust version is being developed [here](https://github.com/Bhabishworgrg/monsetor/tree/main).
 
 ---
 
